@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exchange Desk — AED · USDT · INR</title>
+<style>
+  :root{
+    --bg: #EFEFEB;
+    --surface: #F7F7F4;
+    --surface-2: #E9E9E4;
+    --line: #D8D8D2;
+    --ink: #24262A;
+    --ink-dim: #6E726C;
+    --brass: #0E7A5F;
+    --brass-dim: #0B5C48;
+    --good: #1E8E5A;
+    --bad: #B23A2A;
+    --shadow: 0 1px 2px rgba(20,20,18,0.03), 0 4px 14px rgba(20,20,18,0.04);
+    --font-display: 'Archivo', 'Arial Narrow', sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  @font-face {
+    font-family: 'Archivo';
+    src: local('Archivo');
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    min-height: 100vh;
+  }
+
+  body{
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(14,122,95,0.03), transparent 40%);
+  }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  header h1{
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-size: clamp(24px, 5vw, 32px);
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  header h1 span{ color: var(--brass); }
+
+  header .tag{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+  }
+
+  /* Rate ticker strip — signature element */
+  .ticker{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-family: var(--font-mono);
+    gap: 10px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+
+  .ticker .node{
+    text-align:center;
+    min-width: 70px;
+  }
+
+  .ticker .node .label{
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .ticker .node .val{
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--brass);
+  }
+
+  .ticker .arrow{
+    color: var(--brass-dim);
+    font-size: 20px;
+    flex: 0 0 auto;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 700px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .card h2{
+    font-family: var(--font-display);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-dim);
+    margin: 0 0 18px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card h2::before{
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--brass);
+    display:inline-block;
+    border-radius: 1px;
+  }
+
+  .field{
+    margin-bottom: 16px;
+  }
+
+  .field:last-child{ margin-bottom: 0; }
+
+  .field label{
+    display:block;
+    font-size: 13px;
+    color: var(--ink-dim);
+    margin-bottom: 6px;
+  }
+
+  .field .hint{
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    opacity: 0.75;
+    margin-top: 5px;
+  }
+
+  .input-row{
+    display:flex;
+    align-items:center;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .input-row:focus-within{
+    border-color: var(--brass);
+  }
+
+  .input-row .prefix{
+    padding: 12px 12px 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--brass);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .input-row input{
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 17px;
+    padding: 12px 14px 12px 4px;
+    min-width: 0;
+    -webkit-appearance: none;
+  }
+
+  .input-row input::placeholder{
+    color: var(--ink-dim);
+    opacity: 0.5;
+  }
+
+  /* Results */
+  .result-row{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .result-row:last-child{ border-bottom: none; }
+
+  .result-row .rlabel{
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+
+  .result-row .rval{
+    font-family: var(--font-mono);
+    font-size: 19px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .result-row .rval small{
+    font-size: 12px;
+    color: var(--ink-dim);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+
+  .margin-card{
+    margin-top: 20px;
+    grid-column: 1 / -1;
+  }
+
+  .margin-summary{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 4px;
+  }
+
+  @media (max-width: 700px){
+    .margin-summary{ grid-template-columns: 1fr; }
+  }
+
+  .margin-box{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .margin-box .mlabel{
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
+    margin-bottom: 6px;
+  }
+
+  .margin-box .mval{
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .mval.pos{ color: var(--good); }
+  .mval.neg{ color: var(--bad); }
+
+  footer{
+    text-align:center;
+    margin-top: 40px;
+    color: var(--ink-dim);
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1>Exchange<span>Desk</span></h1>
+    <div class="tag">AED · USDT · INR — your rates only</div>
+  </header>
+
+  <!-- Rate ticker -->
+  <div class="ticker">
+    <div class="node">
+      <div class="label">AED</div>
+      <div class="val" id="tickAed">0.00</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="node">
+      <div class="label">USDT</div>
+      <div class="val" id="tickUsdt">0.00</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="node">
+      <div class="label">INR</div>
+      <div class="val" id="tickInr">0.00</div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- Inputs -->
+    <div class="card">
+      <h2>Enter your rates</h2>
+
+      <div class="field">
+        <label for="aedAmount">AED amount to convert</label>
+        <div class="input-row">
+          <span class="prefix">AED</span>
+          <input type="number" id="aedAmount" inputmode="decimal" placeholder="1000" step="0.01">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="rateAedUsdt">Your AED / USDT rate</label>
+        <div class="input-row">
+          <span class="prefix">AED</span>
+          <input type="number" id="rateAedUsdt" inputmode="decimal" placeholder="3.67" step="0.0001">
+        </div>
+        <div class="hint">AED needed to buy 1 USDT, at your rate</div>
+      </div>
+
+      <div class="field">
+        <label for="rateUsdtInr">Your USDT / INR rate</label>
+        <div class="input-row">
+          <span class="prefix">INR</span>
+          <input type="number" id="rateUsdtInr" inputmode="decimal" placeholder="88.50" step="0.01">
+        </div>
+        <div class="hint">INR paid out for 1 USDT, at your rate</div>
+      </div>
+
+      <div class="field">
+        <label for="costRate">Cost / market AED-USDT rate</label>
+        <div class="input-row">
+          <span class="prefix">AED</span>
+          <input type="number" id="costRate" inputmode="decimal" placeholder="3.65" step="0.0001">
+        </div>
+        <div class="hint">What 1 USDT actually costs you — used only for margin</div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+      <h2>Conversion result</h2>
+
+      <div class="result-row">
+        <div class="rlabel">USDT equivalent</div>
+        <div class="rval" id="outUsdt">—</div>
+      </div>
+
+      <div class="result-row">
+        <div class="rlabel">INR payout</div>
+        <div class="rval" id="outInr">—</div>
+      </div>
+
+      <div class="result-row">
+        <div class="rlabel">Effective AED → INR rate</div>
+        <div class="rval" id="outEffRate">—</div>
+      </div>
+    </div>
+
+    <!-- Margin -->
+    <div class="card margin-card">
+      <h2>Profit / margin on this transaction</h2>
+      <div class="margin-summary">
+        <div class="margin-box">
+          <div class="mlabel">Profit in AED</div>
+          <div class="mval" id="mProfitAed">—</div>
+        </div>
+        <div class="margin-box">
+          <div class="mlabel">Profit in INR</div>
+          <div class="mval" id="mProfitInr">—</div>
+        </div>
+        <div class="margin-box">
+          <div class="mlabel">Margin %</div>
+          <div class="mval" id="mMarginPct">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>All figures are calculated from the rates you type in — no external rate is used.</footer>
+
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  const aedAmountEl = $('aedAmount');
+  const rateAedUsdtEl = $('rateAedUsdt');
+  const rateUsdtInrEl = $('rateUsdtInr');
+  const costRateEl = $('costRate');
+
+  function fmt(n, digits = 2){
+    if (!isFinite(n)) return '—';
+    return n.toLocaleString('en-IN', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  }
+
+  function calc(){
+    const aed = parseFloat(aedAmountEl.value) || 0;
+    const rAedUsdt = parseFloat(rateAedUsdtEl.value) || 0;
+    const rUsdtInr = parseFloat(rateUsdtInrEl.value) || 0;
+    const costRate = parseFloat(costRateEl.value) || 0;
+
+    // Core conversion
+    const usdt = rAedUsdt > 0 ? aed / rAedUsdt : 0;
+    const inr = usdt * rUsdtInr;
+    const effRate = aed > 0 ? inr / aed : 0;
+
+    $('outUsdt').innerHTML = rAedUsdt > 0 ? fmt(usdt, 4) + ' <small>USDT</small>' : '—';
+    $('outInr').innerHTML = inr ? fmt(inr, 2) + ' <small>INR</small>' : '—';
+    $('outEffRate').innerHTML = effRate ? fmt(effRate, 4) + ' <small>INR / AED</small>' : '—';
+
+    // Ticker
+    $('tickAed').textContent = fmt(aed, 2);
+    $('tickUsdt').textContent = rAedUsdt > 0 ? fmt(usdt, 2) : '0.00';
+    $('tickInr').textContent = inr ? fmt(inr, 2) : '0.00';
+
+    // Margin: profit per USDT = (your rate - cost rate) in AED, applied across usdt volume
+    const profitAed = (rAedUsdt - costRate) * usdt;
+    const profitInr = rUsdtInr > 0 && rAedUsdt > 0 ? (profitAed / rAedUsdt) * rUsdtInr : 0;
+    const costTotal = costRate * usdt;
+    const marginPct = costTotal > 0 ? (profitAed / costTotal) * 100 : 0;
+
+    const pAedEl = $('mProfitAed');
+    const pInrEl = $('mProfitInr');
+    const pPctEl = $('mMarginPct');
+
+    if (costRate > 0 && rAedUsdt > 0 && aed > 0){
+      pAedEl.textContent = (profitAed >= 0 ? '+' : '') + fmt(profitAed, 2) + ' AED';
+      pInrEl.textContent = (profitInr >= 0 ? '+' : '') + fmt(profitInr, 2) + ' INR';
+      pPctEl.textContent = (marginPct >= 0 ? '+' : '') + fmt(marginPct, 2) + '%';
+
+      [pAedEl, pInrEl, pPctEl].forEach(el => {
+        el.classList.remove('pos','neg');
+        el.classList.add(profitAed >= 0 ? 'pos' : 'neg');
+      });
+    } else {
+      pAedEl.textContent = '—';
+      pInrEl.textContent = '—';
+      pPctEl.textContent = '—';
+      [pAedEl, pInrEl, pPctEl].forEach(el => el.classList.remove('pos','neg'));
+    }
+  }
+
+  [aedAmountEl, rateAedUsdtEl, rateUsdtInrEl, costRateEl].forEach(el => {
+    el.addEventListener('input', calc);
+  });
+
+  calc();
+</script>
+
+</body>
+</html>
