@@ -404,6 +404,27 @@
       </div>
     </div>
 
+    <!-- Reverse lookup: customer wants X INR, how much AED to collect -->
+    <div class="card margin-card">
+      <h2>Customer wants a fixed INR amount</h2>
+      <div class="field">
+        <label for="targetInr">INR the customer needs to receive</label>
+        <div class="input-row">
+          <span class="prefix">INR</span>
+          <input type="number" id="targetInr" inputmode="decimal" placeholder="10000" step="0.01">
+        </div>
+        <div class="hint">Uses your AED/USDT and USDT/INR rates entered above</div>
+      </div>
+      <div class="result-row">
+        <div class="rlabel">AED you need to collect</div>
+        <div class="rval" id="outReverseAed">—</div>
+      </div>
+      <div class="result-row">
+        <div class="rlabel">USDT involved</div>
+        <div class="rval" id="outReverseUsdt">—</div>
+      </div>
+    </div>
+
   </div>
 
   <footer>All figures are calculated from the rates you type in — no external rate is used.</footer>
@@ -417,6 +438,8 @@
   const rateAedUsdtEl = $('rateAedUsdt');
   const rateUsdtInrEl = $('rateUsdtInr');
   const costRateEl = $('costRate');
+  const targetInrEl = $('targetInr');
+
 
   function fmt(n, digits = 2){
     if (!isFinite(n)) return '—';
@@ -468,9 +491,19 @@
       pPctEl.textContent = '—';
       [pAedEl, pInrEl, pPctEl].forEach(el => el.classList.remove('pos','neg'));
     }
+
+    // Reverse lookup: customer wants a fixed INR amount, how much AED to collect
+    const targetInr = parseFloat(targetInrEl.value) || 0;
+    const revUsdt = rUsdtInr > 0 ? targetInr / rUsdtInr : 0;
+    const revAed = rAedUsdt > 0 ? revUsdt * rAedUsdt : 0;
+
+    $('outReverseAed').innerHTML = (targetInr > 0 && rUsdtInr > 0 && rAedUsdt > 0)
+      ? fmt(revAed, 2) + ' <small>AED</small>' : '—';
+    $('outReverseUsdt').innerHTML = (targetInr > 0 && rUsdtInr > 0)
+      ? fmt(revUsdt, 4) + ' <small>USDT</small>' : '—';
   }
 
-  [aedAmountEl, rateAedUsdtEl, rateUsdtInrEl, costRateEl].forEach(el => {
+  [aedAmountEl, rateAedUsdtEl, rateUsdtInrEl, costRateEl, targetInrEl].forEach(el => {
     el.addEventListener('input', calc);
   });
 
